@@ -2,16 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from "@clerk/nextjs";
-import { Save, Plus, Trash2, Loader2, ArrowLeft, Image as ImageIcon } from "lucide-react";
-import Link from "next/link";
+import { Save, Plus, Trash2, ImageIcon, Calendar as CalendarIcon, Loader2 } from "lucide-react";
 
 export default function AdminPage() {
   const { user, isLoaded } = useUser();
   const [content, setContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const ADMIN_EMAIL = "j74risberg@gmail.com";
 
   useEffect(() => {
     if (isLoaded) {
@@ -23,71 +19,68 @@ export default function AdminPage() {
   }, [isLoaded]);
 
   const save = async () => {
-    setSaving(true);
     await fetch('/api/content', { method: 'POST', body: JSON.stringify(content) });
-    setSaving(false);
-    alert("System uppdaterat.");
+    alert("Sparat!");
   };
 
-  if (!isLoaded || loading) return <div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
-  if (user?.emailAddresses[0].emailAddress !== ADMIN_EMAIL) return <div className="p-20 text-center font-black uppercase">Nekat tillträde.</div>;
+  if (!isLoaded || loading) return <div className="p-20 text-center"><Loader2 className="animate-spin mx-auto" /></div>;
 
   return (
-    <main className="min-h-screen bg-zinc-50 p-6 md:p-12 font-sans">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-12">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="p-2 hover:bg-zinc-200 rounded-full transition-colors"><ArrowLeft size={20}/></Link>
-            <h1 className="text-4xl font-black uppercase italic tracking-tighter">Portal Control</h1>
-          </div>
-          <button onClick={save} disabled={saving} className="bg-black text-white px-10 py-4 font-black uppercase text-xs tracking-[0.2em] hover:bg-zinc-800 transition-all shadow-xl flex items-center gap-2">
-            {saving ? <Loader2 className="animate-spin w-4 h-4" /> : <Save size={16} />} Spara Ändringar
-          </button>
-        </div>
+    <main className="p-6 md:p-12 max-w-6xl mx-auto bg-white min-h-screen border-x shadow-2xl">
+      <div className="flex justify-between items-center mb-12 border-b pb-6">
+        <h1 className="text-4xl font-black uppercase italic tracking-tighter leading-none">Admin System</h1>
+        <button onClick={save} className="bg-black text-white px-10 py-4 font-black uppercase text-xs tracking-widest hover:bg-zinc-800 transition-all">Spara Portalen</button>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* DESIGN SETTINGS */}
-          <div className="lg:col-span-1 space-y-8">
-            <section className="bg-white p-8 border border-zinc-200 shadow-sm">
-              <h2 className="text-xs font-black uppercase tracking-widest mb-6 border-b pb-2 italic">Design & Identitet</h2>
-              <div className="space-y-6">
-                <div>
-                  <label className="text-[10px] font-black uppercase text-zinc-400 block mb-1">Hero Rubrik</label>
-                  <input value={content.heroTitle} onChange={e => setContent({...content, heroTitle: e.target.value})} className="w-full bg-zinc-50 p-4 border-none text-xl font-black uppercase tracking-tighter outline-none focus:ring-2 ring-black" />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black uppercase text-zinc-400 block mb-1">Hero Bild (URL)</label>
-                  <div className="flex gap-2">
-                    <div className="bg-zinc-100 p-4"><ImageIcon size={16}/></div>
-                    <input value={content.heroImage} onChange={e => setContent({...content, heroImage: e.target.value})} className="w-full bg-zinc-50 p-4 border-none text-xs outline-none" />
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
+      <div className="space-y-12">
+        <section className="bg-zinc-50 p-8 border">
+           <h2 className="text-xs font-black uppercase tracking-widest mb-6 border-b pb-2 italic">Global Design</h2>
+           <label className="text-[10px] font-black uppercase text-zinc-400 block mb-2 tracking-widest">Huvudrubrik</label>
+           <input value={content.heroTitle} onChange={e => setContent({...content, heroTitle: e.target.value})} className="w-full bg-white p-4 font-black uppercase text-2xl outline-none mb-6 border-none focus:ring-2 ring-black" />
+           
+           <label className="text-[10px] font-black uppercase text-zinc-400 block mb-2 tracking-widest">Hero Bild-URL</label>
+           <input value={content.heroImage} onChange={e => setContent({...content, heroImage: e.target.value})} className="w-full bg-white p-4 text-xs font-mono outline-none border-none focus:ring-2 ring-black" />
+        </section>
 
-          {/* NEWS SETTINGS */}
-          <div className="lg:col-span-2 space-y-8">
-            <section className="bg-white p-8 border border-zinc-200 shadow-sm">
-              <div className="flex justify-between items-center mb-6 border-b pb-2">
-                <h2 className="text-xs font-black uppercase tracking-widest italic">Nyhetskarusell</h2>
-                <button onClick={() => setContent({...content, news: [{title: "Nyhet", date: "IDAG", text: "Text..."}, ...(content.news || [])]})} className="text-[10px] font-black uppercase text-blue-600">+ Lägg till nyhet</button>
-              </div>
-              <div className="space-y-6">
-                {content.news.map((n: any, i: number) => (
-                  <div key={i} className="p-6 bg-zinc-50 border-l-4 border-black relative group transition-all hover:bg-zinc-100">
-                    <button onClick={() => { const u = content.news.filter((_:any, idx:number) => idx !== i); setContent({...content, news: u}); }} className="absolute top-4 right-4 text-zinc-300 hover:text-red-600"><Trash2 size={16}/></button>
-                    <div className="grid grid-cols-4 gap-4">
-                      <input value={n.date} onChange={e => { const u = [...content.news]; u[i].date = e.target.value; setContent({...content, news: u}); }} className="col-span-1 bg-transparent text-[10px] font-black uppercase tracking-widest text-blue-600 outline-none" />
-                      <input value={n.title} onChange={e => { const u = [...content.news]; u[i].title = e.target.value; setContent({...content, news: u}); }} className="col-span-3 bg-transparent text-lg font-black uppercase italic tracking-tighter outline-none" />
-                    </div>
-                    <textarea value={n.text} onChange={e => { const u = [...content.news]; u[i].text = e.target.value; setContent({...content, news: u}); }} className="w-full bg-transparent mt-4 text-sm text-zinc-500 border-t pt-4 outline-none h-24 resize-none" />
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
-        </div>
+        <section className="border p-8">
+           <div className="flex justify-between items-center mb-8 border-b pb-2">
+             <h2 className="text-xs font-black uppercase tracking-widest italic tracking-widest">Nyhetsflöde</h2>
+             <button onClick={() => setContent({...content, news: [{title: "Ny Nyhet", date: "DATUM", text: "Text...", image: "", expiryDate: ""}, ...content.news]})} className="text-[10px] font-black uppercase bg-black text-white px-3 py-1">+ Lägg till</button>
+           </div>
+           
+           <div className="space-y-8">
+             {content.news.map((n: any, i: number) => (
+               <div key={i} className="p-6 bg-zinc-50 border-l-8 border-black relative group shadow-sm">
+                 <button onClick={() => { const u = content.news.filter((_:any, idx:number) => idx !== i); setContent({...content, news: u}); }} className="absolute top-4 right-4 text-zinc-300 hover:text-red-600"><Trash2 size={20}/></button>
+                 
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                   <div>
+                     <label className="text-[9px] font-black uppercase text-zinc-400">Rubrik</label>
+                     <input value={n.title} onChange={e => { const u = [...content.news]; u[i].title = e.target.value; setContent({...content, news: u}); }} className="w-full bg-white p-3 font-black uppercase text-sm outline-none border-none" />
+                   </div>
+                   <div>
+                     <label className="text-[9px] font-black uppercase text-zinc-400 italic">Visningsdatum (t.ex. 15 MAJ)</label>
+                     <input value={n.date} onChange={e => { const u = [...content.news]; u[i].date = e.target.value; setContent({...content, news: u}); }} className="w-full bg-white p-3 font-bold text-blue-600 text-sm outline-none border-none" />
+                   </div>
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                   <div>
+                     <label className="text-[9px] font-black uppercase text-zinc-400 flex items-center gap-1"><ImageIcon size={10}/> Bild-URL för inlägg</label>
+                     <input value={n.image} onChange={e => { const u = [...content.news]; u[i].image = e.target.value; setContent({...content, news: u}); }} className="w-full bg-white p-3 text-[10px] font-mono outline-none border-none" />
+                   </div>
+                   <div>
+                     <label className="text-[9px] font-black uppercase text-red-500 flex items-center gap-1"><CalendarIcon size={10}/> Sista visningsdatum (Döljs efter detta)</label>
+                     <input type="date" value={n.expiryDate} onChange={e => { const u = [...content.news]; u[i].expiryDate = e.target.value; setContent({...content, news: u}); }} className="w-full bg-white p-3 text-xs outline-none border-none font-bold" />
+                   </div>
+                 </div>
+
+                 <label className="text-[9px] font-black uppercase text-zinc-400">Beskrivning</label>
+                 <textarea value={n.text} onChange={e => { const u = [...content.news]; u[i].text = e.target.value; setContent({...content, news: u}); }} className="w-full bg-white p-3 text-xs text-zinc-500 h-24 resize-none outline-none border-none" />
+               </div>
+             ))}
+           </div>
+        </section>
       </div>
     </main>
   );
