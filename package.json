@@ -24,5 +24,6 @@
     "clsx": "latest",
     "tailwind-merge": "latest",
     "@vercel/kv": "latest"
+    "ioredis": "latest"
   }
 }
