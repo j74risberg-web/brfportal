@@ -11,7 +11,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
 
   // SÄKERHET: Här skriver du in din e-postadress
-  const ADMIN_EMAIL = "din-email@gmail.com"; 
+  const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
   useEffect(() => {
     fetch('/api/content').then(res => res.json()).then(data => {
