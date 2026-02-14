@@ -9,7 +9,7 @@ export default function Dashboard() {
   const { user } = useUser();
   const [content, setContent] = useState<any>(null);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [selectedNews, setSelectedNews] = useState<any>(null); // För "Läs mer"-fönstret
+  const [selectedNews, setSelectedNews] = useState<any>(null); 
   const today = new Date().toISOString().split('T')[0];
   const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
@@ -17,6 +17,7 @@ export default function Dashboard() {
     fetch('/api/content')
       .then(res => res.json())
       .then(data => {
+        // Filtrerar bort nyheter som passerat sitt slutdatum
         const visibleNews = data.news?.filter((n: any) => !n.expiryDate || n.expiryDate >= today) || [];
         setContent({ ...data, news: visibleNews });
       });
@@ -30,7 +31,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 pb-20 md:pb-12">
-      {/* HEADER - Behåller System Admin och Avatar */}
+      {/* HEADER - */}
       <header className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic">
           BRF Slalomsvängen 2
@@ -45,11 +46,11 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* HERO SECTION - Oförändrad */}
+      {/* HERO SECTION - Optimerad för mobil (h-[25vh]) */}
       <section className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="relative h-[40vh] md:h-[55vh] w-full bg-zinc-900 overflow-hidden shadow-2xl rounded-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent flex items-center p-8 md:p-16 z-10">
-            <h2 className="text-white text-4xl md:text-7xl font-black uppercase italic leading-none tracking-tighter border-l-8 border-white pl-6">
+        <div className="relative h-[25vh] md:h-[55vh] w-full bg-zinc-900 overflow-hidden shadow-2xl rounded-sm">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent flex items-center p-6 md:p-16 z-10">
+            <h2 className="text-white text-3xl md:text-7xl font-black uppercase italic leading-none tracking-tighter border-l-4 md:border-l-8 border-white pl-4 md:pl-6">
               {content.heroTitle}
             </h2>
           </div>
@@ -61,9 +62,9 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* NY KOMPAKT NYHETSKARUSELL */}
+      {/* KOMPAKT NYHETSKARUSELL - */}
       {content.news && content.news.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 md:px-6 mt-12">
+        <section className="max-w-7xl mx-auto px-4 md:px-6 mt-8 md:mt-12">
           <div className="bg-zinc-50 border flex flex-col md:flex-row h-auto md:h-64 shadow-sm overflow-hidden group">
             <div className="w-full md:w-1/3 h-48 md:h-auto overflow-hidden">
               <img 
@@ -81,7 +82,6 @@ export default function Dashboard() {
                 {content.news[activeSlide].title}
               </h3>
               
-              {/* Klippt text för kompakt vy */}
               <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4">
                 {content.news[activeSlide].text}
               </p>
@@ -107,8 +107,8 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* SERVICE GRID - Bevarad med 3 val */}
-      <section className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 mb-20">
+      {/* SERVICE GRID - */}
+      <section className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 md:mt-12 mb-20">
         <Link href="/tvattstuga" className="group p-10 bg-blue-600 text-white flex flex-col gap-6 hover:bg-blue-700 transition-all shadow-xl">
           <Calendar size={48} className="group-hover:rotate-12 transition-transform duration-500" />
           <div>
@@ -134,7 +134,7 @@ export default function Dashboard() {
         </Link>
       </section>
 
-      {/* MODAL FÖR HELA NYHETEN */}
+      {/* MODAL FÖR HELA NYHETEN - */}
       {selectedNews && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
           <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setSelectedNews(null)} />
@@ -148,7 +148,7 @@ export default function Dashboard() {
               </div>
               <div className="w-full md:w-1/2 p-8 md:p-16">
                 <span className="text-blue-600 font-black text-xs uppercase tracking-[0.4em] mb-4 block">{selectedNews.date}</span>
-                <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-8 leading-none">{selectedNews.title}</h3>
+                <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-8 leading-none text-zinc-900">{selectedNews.title}</h3>
                 <div className="prose prose-sm max-w-none text-zinc-500 leading-relaxed whitespace-pre-wrap font-medium">
                   {selectedNews.text}
                 </div>
@@ -158,8 +158,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* MOBILE NAV - Bevarad */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-8 py-4 flex justify-between items-center z-50">
+      {/* MOBILE NAV */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-8 py-4 flex justify-between items-center z-50 shadow-2xl">
         <Link href="/" className="text-black"><Home size={22} /></Link>
         <Link href="/tvattstuga" className="text-zinc-400"><Calendar size={22} /></Link>
         <Link href="/bastu" className="text-zinc-400"><Waves size={22} /></Link>
