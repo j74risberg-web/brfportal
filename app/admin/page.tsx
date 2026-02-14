@@ -96,6 +96,12 @@ export default function SuperAdminPage() {
                     <input value={content.heroTitle} onChange={e => setContent({...content, heroTitle: e.target.value})} className="w-full bg-zinc-50 p-4 font-black uppercase text-xl outline-none" />
                   </div>
                   <div>
+                    <label className="text-[8px] font-black uppercase mb-1 block">Rubrik Storlek (t.ex. 80px eller 4.5rem)</label>
+                    <input  value={content.heroTitleSize || ''} placeholder="Lämna tom för standard" onChange={e => setContent({...content, heroTitleSize: e.target.value})} 
+                    className="w-full bg-zinc-50 p-4 font-bold text-xs outline-none focus:ring-2 ring-black" 
+                    />    
+                  </div>  
+                  <div>
                     <label className="text-[8px] font-black uppercase mb-1 block">Bild-URL (Fasad)</label>
                     <input value={content.heroImage} onChange={e => setContent({...content, heroImage: e.target.value})} className="w-full bg-zinc-50 p-4 text-[10px] font-mono outline-none" />
                   </div>
