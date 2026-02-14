@@ -41,20 +41,17 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 pb-20 md:pb-12">
-      {/* HEADER - */}
-      <header className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
-        <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic">
-          BRF Slalomsvängen 2
-        </h1>
-        <div className="flex items-center gap-6">
-          {user?.emailAddresses[0].emailAddress === ADMIN_EMAIL && (
-            <Link href="/admin" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors">
-              System Admin
-            </Link>
-          )}
-          <UserButton afterSignOutUrl="/" />
-        </div>
-      </header>
+      {/* HEADER - Nu utan titel, men behåller navigering */}
+<header className="max-w-7xl mx-auto px-6 py-8 flex justify-end items-center">
+  <div className="flex items-center gap-6">
+    {user?.emailAddresses[0].emailAddress === ADMIN_EMAIL && (
+      <Link href="/admin" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors">
+        System Admin
+      </Link>
+    )}
+    <UserButton afterSignOutUrl="/" />
+  </div>
+</header>
 
       {/* HERO SECTION - Optimerad mobilhöjd */}
       <section className="max-w-7xl mx-auto px-4 md:px-6">
