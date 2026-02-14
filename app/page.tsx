@@ -92,6 +92,12 @@ export default function Page() {
 
   return (
     <div className="app">
+      <head>
+  <title>Slalomsvängen 2</title>
+  <link rel="apple-touch-icon" href="/icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+</head>
       {page === "login" ? (
         <div className="login-screen">
           <div className="login-card">
