@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { UserButton, useUser } from "@clerk/nextjs";
-import { ChevronLeft, ChevronRight, Calendar, Home, Waves, Loader2, X, Maximize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Home, Waves, Loader2, X, Maximize2, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
 export default function Dashboard() {
@@ -10,10 +10,19 @@ export default function Dashboard() {
   const [content, setContent] = useState<any>(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const [selectedNews, setSelectedNews] = useState<any>(null); 
+  const [activeMenu, setActiveMenu] = useState<string | null>(null); // För dropdown
+  
   const today = new Date().toISOString().split('T')[0];
   const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
-  // Hämta innehåll
+  // Din nya menystruktur
+  const menuData = [
+    { title: 'Om', links: ['Föreningen', 'Fastigheten', 'Gemensamma utrymmen', 'Stadgar & Regler'] },
+    { title: 'Ekonomi', links: ['Årsredovisningar', 'Mäklarinformation', 'Avgifter'] },
+    { title: 'Information', links: ['Nyinflyttad', 'Renovering', 'Parkering', 'Avfall & Miljö'] },
+    { title: 'Styrelse', links: ['Kontakt', 'Mötesprotokoll', 'Valberedning'] },
+  ];
+
   useEffect(() => {
     fetch('/api/content')
       .then(res => res.json())
@@ -23,13 +32,12 @@ export default function Dashboard() {
       });
   }, []);
 
-  // TIMER FÖR KARUSELLEN (5 sekunder)
   useEffect(() => {
     if (content?.news?.length > 1) {
       const timer = setInterval(() => {
         setActiveSlide((prev) => (prev + 1) % content.news.length);
       }, 5000);
-      return () => clearInterval(timer); // Rensar timern om man lämnar sidan
+      return () => clearInterval(timer);
     }
   }, [content?.news?.length]);
 
@@ -41,19 +49,19 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 pb-20 md:pb-12">
-      {/* HEADER - Nu utan titel, men behåller navigering */}
-<header className="max-w-7xl mx-auto px-6 py-8 flex justify-end items-center">
-  <div className="flex items-center gap-6">
-    {user?.emailAddresses[0].emailAddress === ADMIN_EMAIL && (
-      <Link href="/admin" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors">
-        System Admin
-      </Link>
-    )}
-    <UserButton afterSignOutUrl="/" />
-  </div>
-</header>
+      {/* HEADER - */}
+      <header className="max-w-7xl mx-auto px-6 py-4 flex justify-end items-center">
+        <div className="flex items-center gap-6">
+          {user?.emailAddresses[0].emailAddress === ADMIN_EMAIL && (
+            <Link href="/admin" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors">
+              System Admin
+            </Link>
+          )}
+          <UserButton afterSignOutUrl="/" />
+        </div>
+      </header>
 
-      {/* HERO SECTION - Optimerad mobilhöjd */}
+      {/* HERO SECTION - */}
       <section className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="relative h-[25vh] md:h-[55vh] w-full bg-zinc-900 overflow-hidden shadow-2xl rounded-sm">
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent flex items-center p-6 md:p-16 z-10">
@@ -69,7 +77,40 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* NYHETSKARUSELL MED TIMER & MÄTARE - */}
+      {/* TOP MENY MED DROPDOWNS - */}
+      <nav className="max-w-7xl mx-auto px-4 md:px-6 mt-4 relative z-50">
+        <div className="bg-black text-white flex flex-wrap items-center justify-center md:justify-start gap-1 md:gap-8 px-4 md:px-8 py-3 rounded-sm shadow-xl">
+          {menuData.map((menu) => (
+            <div 
+              key={menu.title} 
+              className="relative"
+              onMouseEnter={() => setActiveMenu(menu.title)}
+              onMouseLeave={() => setActiveMenu(null)}
+            >
+              <button className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 hover:text-zinc-400 transition-colors">
+                {menu.title} <ChevronDown size={12} className={`transition-transform duration-300 ${activeMenu === menu.title ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {/* DROPDOWN INNEHÅLL */}
+              {activeMenu === menu.title && (
+                <div className="absolute top-full left-0 w-56 bg-black border-t border-zinc-800 shadow-2xl py-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {menu.links.map((link) => (
+                    <Link 
+                      key={link} 
+                      href={`/${link.toLowerCase().replace(/ /g, '-')}`}
+                      className="block px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all"
+                    >
+                      {link}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </nav>
+
+      {/* NYHETSKARUSELL - */}
       {content.news && content.news.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 md:px-6 mt-8 md:mt-12">
           <div className="bg-zinc-50 border flex flex-col md:flex-row h-auto md:h-64 shadow-sm overflow-hidden group">
@@ -88,20 +129,13 @@ export default function Dashboard() {
               <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tighter mb-2">
                 {content.news[activeSlide].title}
               </h3>
-              
-              <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4">
+              <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4 text-zinc-500">
                 {content.news[activeSlide].text}
               </p>
-
               <div className="flex items-center justify-between mt-auto">
-                <button 
-                  onClick={() => setSelectedNews(content.news[activeSlide])}
-                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-900 hover:text-blue-600 transition-colors"
-                >
+                <button onClick={() => setSelectedNews(content.news[activeSlide])} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-900 hover:text-blue-600 transition-colors">
                   <Maximize2 size={12}/> Läs hela nyheten
                 </button>
-                
-                {/* NAVIGERING & MÄTARE - */}
                 <div className="flex items-center gap-4">
                   <div className="text-[10px] font-black text-zinc-300 uppercase tracking-widest">
                     {activeSlide + 1} / {content.news.length}
@@ -130,7 +164,6 @@ export default function Dashboard() {
             <p className="text-blue-200 text-[10px] font-black uppercase mt-1 tracking-widest">Digitalt System</p>
           </div>
         </Link>
-
         <Link href="/bastu" className="group p-10 bg-emerald-600 text-white flex flex-col gap-6 hover:bg-emerald-700 transition-all shadow-xl">
           <Waves size={48} className="group-hover:scale-110 transition-transform duration-500" />
           <div>
@@ -138,7 +171,6 @@ export default function Dashboard() {
             <p className="text-emerald-200 text-[10px] font-black uppercase mt-1 tracking-widest">Tidspass</p>
           </div>
         </Link>
-
         <Link href="/gastrum" className="group p-10 bg-zinc-900 text-white flex flex-col gap-6 hover:bg-black transition-all shadow-xl">
           <Home size={48} className="group-hover:-translate-y-2 transition-transform duration-500" />
           <div>
@@ -148,7 +180,7 @@ export default function Dashboard() {
         </Link>
       </section>
 
-      {/* MODAL FÖR HELA NYHETEN - */}
+      {/* MODAL FÖR NYHETER */}
       {selectedNews && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
           <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setSelectedNews(null)} />
@@ -163,7 +195,7 @@ export default function Dashboard() {
               <div className="w-full md:w-1/2 p-8 md:p-16">
                 <span className="text-blue-600 font-black text-xs uppercase tracking-[0.4em] mb-4 block">{selectedNews.date}</span>
                 <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-8 leading-none text-zinc-900">{selectedNews.title}</h3>
-                <div className="prose prose-sm max-w-none text-zinc-500 leading-relaxed whitespace-pre-wrap font-medium text-zinc-600">
+                <div className="prose prose-sm max-w-none text-zinc-500 leading-relaxed whitespace-pre-wrap font-medium">
                   {selectedNews.text}
                 </div>
               </div>
@@ -172,7 +204,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* MOBILE NAV - */}
+      {/* MOBILE NAV */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-8 py-4 flex justify-between items-center z-50 shadow-2xl">
         <Link href="/" className="text-black"><Home size={22} /></Link>
         <Link href="/tvattstuga" className="text-zinc-400"><Calendar size={22} /></Link>
