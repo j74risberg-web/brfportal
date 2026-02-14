@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { UserButton, useUser } from "@clerk/nextjs";
-import { ChevronLeft, ChevronRight, Calendar, Home, Waves, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Home, Waves, Loader2, X, Maximize2 } from "lucide-react";
 import Link from "next/link";
 
 export default function Dashboard() {
   const { user } = useUser();
   const [content, setContent] = useState<any>(null);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [selectedNews, setSelectedNews] = useState<any>(null); // För "Läs mer"-fönstret
   const today = new Date().toISOString().split('T')[0];
   const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
@@ -16,7 +17,6 @@ export default function Dashboard() {
     fetch('/api/content')
       .then(res => res.json())
       .then(data => {
-        // Behåller din logik för att dölja utgångna nyheter
         const visibleNews = data.news?.filter((n: any) => !n.expiryDate || n.expiryDate >= today) || [];
         setContent({ ...data, news: visibleNews });
       });
@@ -30,7 +30,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 pb-20 md:pb-12">
-      {/* HEADER - Behållit System Admin och Avatar */}
+      {/* HEADER - Behåller System Admin och Avatar */}
       <header className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic">
           BRF Slalomsvängen 2
@@ -61,11 +61,11 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* NYHETSKARUSELL - TILLAGD */}
+      {/* NY KOMPAKT NYHETSKARUSELL */}
       {content.news && content.news.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 md:px-6 mt-12">
-          <div className="bg-zinc-50 border flex flex-col md:flex-row items-stretch min-h-[450px] shadow-sm overflow-hidden">
-            <div className="w-full md:w-1/2 h-64 md:h-auto relative overflow-hidden bg-zinc-200">
+          <div className="bg-zinc-50 border flex flex-col md:flex-row h-auto md:h-64 shadow-sm overflow-hidden group">
+            <div className="w-full md:w-1/3 h-48 md:h-auto overflow-hidden">
               <img 
                 key={activeSlide}
                 src={content.news[activeSlide].image || "https://images.unsplash.com/photo-1560518883-ce09059eeffa"} 
@@ -73,27 +73,33 @@ export default function Dashboard() {
                 alt="Nyhet"
               />
             </div>
-            <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col justify-center relative bg-white border-l">
-              <span className="text-blue-600 font-black text-[10px] uppercase tracking-[0.4em] mb-4 block">
+            <div className="w-full md:w-2/3 p-6 md:p-10 flex flex-col justify-center bg-white relative border-l">
+              <span className="text-blue-600 font-black text-[9px] uppercase tracking-[0.3em] mb-2">
                 {content.news[activeSlide].date}
               </span>
-              <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-6 leading-none">
+              <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tighter mb-2">
                 {content.news[activeSlide].title}
               </h3>
-              <p className="text-zinc-500 text-sm md:text-base leading-relaxed mb-10 max-w-md">
+              
+              {/* Klippt text för kompakt vy */}
+              <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4">
                 {content.news[activeSlide].text}
               </p>
-              <div className="flex items-center gap-6 mt-auto pt-8 border-t border-zinc-100">
+
+              <div className="flex items-center justify-between mt-auto">
+                <button 
+                  onClick={() => setSelectedNews(content.news[activeSlide])}
+                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-900 hover:text-blue-600 transition-colors"
+                >
+                  <Maximize2 size={12}/> Läs hela nyheten
+                </button>
                 <div className="flex gap-2">
-                  <button onClick={() => setActiveSlide((prev) => (prev - 1 + content.news.length) % content.news.length)} className="p-3 border border-zinc-200 hover:bg-black hover:text-white transition-all">
-                    <ChevronLeft size={20} />
+                  <button onClick={() => setActiveSlide((prev) => (prev - 1 + content.news.length) % content.news.length)} className="p-2 border border-zinc-200 hover:bg-black hover:text-white transition-all">
+                    <ChevronLeft size={16} />
                   </button>
-                  <button onClick={() => setActiveSlide((prev) => (prev + 1) % content.news.length)} className="p-3 border border-zinc-200 hover:bg-black hover:text-white transition-all">
-                    <ChevronRight size={20} />
+                  <button onClick={() => setActiveSlide((prev) => (prev + 1) % content.news.length)} className="p-2 border border-zinc-200 hover:bg-black hover:text-white transition-all">
+                    <ChevronRight size={16} />
                   </button>
-                </div>
-                <div className="text-[10px] font-black text-zinc-300 uppercase tracking-widest">
-                  {activeSlide + 1} / {content.news.length}
                 </div>
               </div>
             </div>
@@ -101,7 +107,7 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* SERVICE GRID - Återställd till 3 val */}
+      {/* SERVICE GRID - Bevarad med 3 val */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 mb-20">
         <Link href="/tvattstuga" className="group p-10 bg-blue-600 text-white flex flex-col gap-6 hover:bg-blue-700 transition-all shadow-xl">
           <Calendar size={48} className="group-hover:rotate-12 transition-transform duration-500" />
@@ -128,7 +134,31 @@ export default function Dashboard() {
         </Link>
       </section>
 
-      {/* MOBILE NAV - Oförändrad */}
+      {/* MODAL FÖR HELA NYHETEN */}
+      {selectedNews && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setSelectedNews(null)} />
+          <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto relative z-10 shadow-2xl animate-in zoom-in-95 duration-300 rounded-sm">
+            <button onClick={() => setSelectedNews(null)} className="absolute top-6 right-6 p-2 bg-black text-white hover:bg-zinc-800 transition-colors z-20">
+              <X size={24}/>
+            </button>
+            <div className="flex flex-col md:flex-row">
+              <div className="w-full md:w-1/2 h-64 md:h-auto">
+                <img src={selectedNews.image || "https://images.unsplash.com/photo-1560518883-ce09059eeffa"} className="w-full h-full object-cover" alt="Full" />
+              </div>
+              <div className="w-full md:w-1/2 p-8 md:p-16">
+                <span className="text-blue-600 font-black text-xs uppercase tracking-[0.4em] mb-4 block">{selectedNews.date}</span>
+                <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-8 leading-none">{selectedNews.title}</h3>
+                <div className="prose prose-sm max-w-none text-zinc-500 leading-relaxed whitespace-pre-wrap font-medium">
+                  {selectedNews.text}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MOBILE NAV - Bevarad */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-8 py-4 flex justify-between items-center z-50">
         <Link href="/" className="text-black"><Home size={22} /></Link>
         <Link href="/tvattstuga" className="text-zinc-400"><Calendar size={22} /></Link>
