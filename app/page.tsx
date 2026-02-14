@@ -13,15 +13,25 @@ export default function Dashboard() {
   const today = new Date().toISOString().split('T')[0];
   const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
+  // Hämta innehåll
   useEffect(() => {
     fetch('/api/content')
       .then(res => res.json())
       .then(data => {
-        // Filtrerar bort nyheter som passerat sitt slutdatum
         const visibleNews = data.news?.filter((n: any) => !n.expiryDate || n.expiryDate >= today) || [];
         setContent({ ...data, news: visibleNews });
       });
   }, []);
+
+  // TIMER FÖR KARUSELLEN (5 sekunder)
+  useEffect(() => {
+    if (content?.news?.length > 1) {
+      const timer = setInterval(() => {
+        setActiveSlide((prev) => (prev + 1) % content.news.length);
+      }, 5000);
+      return () => clearInterval(timer); // Rensar timern om man lämnar sidan
+    }
+  }, [content?.news?.length]);
 
   if (!content) return (
     <div className="h-screen flex items-center justify-center bg-white">
@@ -46,7 +56,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* HERO SECTION - Optimerad för mobil (h-[25vh]) */}
+      {/* HERO SECTION - Optimerad mobilhöjd */}
       <section className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="relative h-[25vh] md:h-[55vh] w-full bg-zinc-900 overflow-hidden shadow-2xl rounded-sm">
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent flex items-center p-6 md:p-16 z-10">
@@ -62,7 +72,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* KOMPAKT NYHETSKARUSELL - */}
+      {/* NYHETSKARUSELL MED TIMER & MÄTARE - */}
       {content.news && content.news.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 md:px-6 mt-8 md:mt-12">
           <div className="bg-zinc-50 border flex flex-col md:flex-row h-auto md:h-64 shadow-sm overflow-hidden group">
@@ -93,13 +103,20 @@ export default function Dashboard() {
                 >
                   <Maximize2 size={12}/> Läs hela nyheten
                 </button>
-                <div className="flex gap-2">
-                  <button onClick={() => setActiveSlide((prev) => (prev - 1 + content.news.length) % content.news.length)} className="p-2 border border-zinc-200 hover:bg-black hover:text-white transition-all">
-                    <ChevronLeft size={16} />
-                  </button>
-                  <button onClick={() => setActiveSlide((prev) => (prev + 1) % content.news.length)} className="p-2 border border-zinc-200 hover:bg-black hover:text-white transition-all">
-                    <ChevronRight size={16} />
-                  </button>
+                
+                {/* NAVIGERING & MÄTARE - */}
+                <div className="flex items-center gap-4">
+                  <div className="text-[10px] font-black text-zinc-300 uppercase tracking-widest">
+                    {activeSlide + 1} / {content.news.length}
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setActiveSlide((prev) => (prev - 1 + content.news.length) % content.news.length)} className="p-2 border border-zinc-200 hover:bg-black hover:text-white transition-all">
+                      <ChevronLeft size={16} />
+                    </button>
+                    <button onClick={() => setActiveSlide((prev) => (prev + 1) % content.news.length)} className="p-2 border border-zinc-200 hover:bg-black hover:text-white transition-all">
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -149,7 +166,7 @@ export default function Dashboard() {
               <div className="w-full md:w-1/2 p-8 md:p-16">
                 <span className="text-blue-600 font-black text-xs uppercase tracking-[0.4em] mb-4 block">{selectedNews.date}</span>
                 <h3 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter mb-8 leading-none text-zinc-900">{selectedNews.title}</h3>
-                <div className="prose prose-sm max-w-none text-zinc-500 leading-relaxed whitespace-pre-wrap font-medium">
+                <div className="prose prose-sm max-w-none text-zinc-500 leading-relaxed whitespace-pre-wrap font-medium text-zinc-600">
                   {selectedNews.text}
                 </div>
               </div>
@@ -158,7 +175,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* MOBILE NAV */}
+      {/* MOBILE NAV - */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-8 py-4 flex justify-between items-center z-50 shadow-2xl">
         <Link href="/" className="text-black"><Home size={22} /></Link>
         <Link href="/tvattstuga" className="text-zinc-400"><Calendar size={22} /></Link>
