@@ -11,7 +11,7 @@ export default function AdminPage() {
   const [error, setError] = useState(false);
 
   // ÄNDRA TILL DIN EMAIL HÄR!
-  const ADMIN_EMAIL = "din-email@gmail.com"; 
+  const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
   useEffect(() => {
     if (isLoaded) {
