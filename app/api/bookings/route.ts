@@ -1,21 +1,15 @@
-import { kv } from '@vercel/kv';
+import Redis from 'ioredis';
 import { NextResponse } from 'next/server';
 
+const redis = new Redis(process.env.REDIS_URL || "");
+
 export async function GET() {
-  try {
-    const bookings = await kv.get('bookings');
-    return NextResponse.json(bookings || []);
-  } catch (error) {
-    return NextResponse.json([]);
-  }
+  const data = await redis.get('bookings');
+  return NextResponse.json(data ? JSON.parse(data) : []);
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    await kv.set('bookings', body);
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ success: false }, { status: 500 });
-  }
+  const body = await request.json();
+  await redis.set('bookings', JSON.stringify(body));
+  return NextResponse.json({ success: true });
 }
