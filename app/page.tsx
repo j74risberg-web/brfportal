@@ -15,6 +15,7 @@ export default function Dashboard() {
   const today = new Date().toISOString().split('T')[0];
   const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
+  // Menystruktur: Optimerad för plats (Info + Styrelse gömd på mobil)
   const menuData = [
     { title: 'Om', links: ['Föreningen', 'Fastigheten', 'Stadgar & Regler'] },
     { title: 'Ekonomi', links: ['Årsredovisningar', 'Mäklarinfo', 'Avgifter'] },
@@ -60,7 +61,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* HERO SECTION - Text flyttad till övre vänstra hörnet */}
+      {/* HERO SECTION - Dynamisk rubrik i vänstra hörnet */}
       <section className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="relative h-[25vh] md:h-[55vh] w-full bg-zinc-900 overflow-hidden shadow-2xl rounded-sm">
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent flex items-start justify-start p-10 md:p-24 z-10">
@@ -79,7 +80,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* PREMIUM TOP MENU */}
+      {/* PREMIUM TOP MENU - Glassmorphism */}
       <nav className="max-w-7xl mx-auto px-4 md:px-6 mt-4 md:-mt-6 relative z-50">
         <div className="bg-black/90 backdrop-blur-md text-white flex items-center justify-center md:justify-start gap-1 md:gap-4 px-2 md:px-8 py-2 md:py-3 rounded-sm md:rounded-xl shadow-2xl border border-white/5">
           {menuData.map((menu) => (
@@ -160,27 +161,35 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* SERVICE GRID */}
-      <section className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 md:mt-12 mb-20">
-        <Link href="/tvattstuga" className="group p-10 bg-blue-600 text-white flex flex-col gap-6 hover:bg-blue-700 transition-all shadow-xl">
-          <Calendar size={48} className="group-hover:rotate-12 transition-transform duration-500" />
+      {/* SERVICE GRID - Kompakta glass-knappar */}
+      <section className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 md:mt-12 mb-20">
+        <Link href="/tvattstuga" className="group p-6 bg-blue-600/90 backdrop-blur-md text-white flex items-center gap-5 hover:bg-blue-600 transition-all shadow-lg rounded-sm border border-white/10">
+          <div className="bg-white/10 p-3 rounded-sm group-hover:rotate-12 transition-transform duration-500">
+            <Calendar size={28} />
+          </div>
           <div>
-            <h4 className="text-2xl font-black uppercase italic tracking-tighter">Boka Tvätt</h4>
-            <p className="text-blue-200 text-[10px] font-black uppercase mt-1 tracking-widest">Digitalt System</p>
+            <h4 className="text-lg font-black uppercase italic tracking-tighter">Boka Tvätt</h4>
+            <p className="text-blue-100/70 text-[9px] font-black uppercase tracking-widest">Digitalt System</p>
           </div>
         </Link>
-        <Link href="/bastu" className="group p-10 bg-emerald-600 text-white flex flex-col gap-6 hover:bg-emerald-700 transition-all shadow-xl">
-          <Waves size={48} className="group-hover:scale-110 transition-transform duration-500" />
+
+        <Link href="/bastu" className="group p-6 bg-emerald-600/90 backdrop-blur-md text-white flex items-center gap-5 hover:bg-emerald-600 transition-all shadow-lg rounded-sm border border-white/10">
+          <div className="bg-white/10 p-3 rounded-sm group-hover:scale-110 transition-transform duration-500">
+            <Waves size={28} />
+          </div>
           <div>
-            <h4 className="text-2xl font-black uppercase italic tracking-tighter">Boka Bastu</h4>
-            <p className="text-emerald-200 text-[10px] font-black uppercase mt-1 tracking-widest">Tidspass</p>
+            <h4 className="text-lg font-black uppercase italic tracking-tighter">Boka Bastu</h4>
+            <p className="text-emerald-100/70 text-[9px] font-black uppercase tracking-widest">Tidspass</p>
           </div>
         </Link>
-        <Link href="/gastrum" className="group p-10 bg-zinc-900 text-white flex flex-col gap-6 hover:bg-black transition-all shadow-xl">
-          <Home size={48} className="group-hover:-translate-y-2 transition-transform duration-500" />
+
+        <Link href="/gastrum" className="group p-6 bg-zinc-900/90 backdrop-blur-md text-white flex items-center gap-5 hover:bg-black transition-all shadow-lg rounded-sm border border-white/10">
+          <div className="bg-white/10 p-3 rounded-sm group-hover:-translate-y-1 transition-transform duration-500">
+            <Home size={28} />
+          </div>
           <div>
-            <h4 className="text-2xl font-black uppercase italic tracking-tighter">Gästrum</h4>
-            <p className="text-zinc-500 text-[10px] font-black uppercase mt-1 tracking-widest">Hela Dygn</p>
+            <h4 className="text-lg font-black uppercase italic tracking-tighter">Gästrum</h4>
+            <p className="text-zinc-500 text-[9px] font-black uppercase tracking-widest">Hela Dygn</p>
           </div>
         </Link>
       </section>
