@@ -269,4 +269,32 @@ export default function Page() {
         .hero-text { position: relative; z-index: 1; }
         .main-content { padding: 1rem; max-width: 600px; margin: 0 auto; padding-bottom: 7rem; }
         .card { background: white; border-radius: 1.5rem; padding: 1.25rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 1rem; }
-        .cal-header { display: flex;
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-weight: 800; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; }
+        .wd { text-align: center; font-size: 0.7rem; color: #94a3b8; font-weight: 800; }
+        .cell { aspect-ratio: 1; border-radius: 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; font-weight: 700; transition: 0.2s; }
+        .cell.free { background: #f1f5f9; color: #64748b; }
+        .cell.booked { background: #e2e8f0; color: #94a3b8; }
+        .cell.my-booked { background: #1f3d2b; color: white; }
+        .cell.selected { border: 2px solid #1f3d2b; transform: scale(1.05); }
+        .slot-count { font-size: 0.5rem; margin-top: 2px; opacity: 0.8; }
+        .slots-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .slot-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .slot-item button { padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; cursor: pointer; font-weight: 600; }
+        .book { background: #1f3d2b; color: white; }
+        .cancel { background: #fee2e2; color: #ef4444; }
+        .owner { font-size: 0.7rem; color: #94a3b8; }
+        .user-card { text-align: center; }
+        .avatar { width: 50px; height: 50px; background: #1f3d2b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: 800; }
+        .booking-row { display: flex; justify-content: space-between; align-items: center; }
+        .booking-row p { font-size: 0.8rem; color: #64748b; margin: 0; }
+        .booking-row button { border: none; background: #fee2e2; color: #ef4444; padding: 5px 10px; border-radius: 5px; font-size: 0.7rem; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; padding: 0.8rem; z-index: 100; }
+        .nav-container { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0 0.5rem; scrollbar-width: none; }
+        .bottom-nav button { background: #1a1a1a; border: none; color: #94a3b8; padding: 0.6rem 1.2rem; border-radius: 2rem; white-space: nowrap; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+        .bottom-nav button.active { background: white; color: black; }
+        .admin-view input, .admin-view select, .admin-view textarea { width: 100%; padding: 0.8rem; border: 1px solid #e2e8f0; border-radius: 1rem; margin-top: 5px; font-family: inherit; }
+      `}</style>
+    </div>
+  );
+}
