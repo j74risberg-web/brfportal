@@ -10,17 +10,17 @@ export default function Dashboard() {
   const [content, setContent] = useState<any>(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const [selectedNews, setSelectedNews] = useState<any>(null); 
-  const [activeMenu, setActiveMenu] = useState<string | null>(null); // För dropdown
+  const [activeMenu, setActiveMenu] = useState<string | null>(null); 
   
   const today = new Date().toISOString().split('T')[0];
   const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
-  // Din nya menystruktur
+  // Menystruktur: Styrelse visas endast på desktop (hidden md:block logik nedan)
   const menuData = [
-    { title: 'Om', links: ['Föreningen', 'Fastigheten', 'Gemensamma utrymmen', 'Stadgar & Regler'] },
-    { title: 'Ekonomi', links: ['Årsredovisningar', 'Mäklarinformation', 'Avgifter'] },
-    { title: 'Information', links: ['Nyinflyttad', 'Renovering', 'Parkering', 'Avfall & Miljö'] },
-    { title: 'Styrelse', links: ['Kontakt', 'Mötesprotokoll', 'Valberedning'] },
+    { title: 'Om', links: ['Föreningen', 'Fastigheten', 'Stadgar & Regler'] },
+    { title: 'Ekonomi', links: ['Årsredovisningar', 'Mäklarinfo', 'Avgifter'] },
+    { title: 'Info', links: ['Nyinflyttad', 'Renovering', 'Parkering', 'Avfall'] },
+    { title: 'Styrelse', links: ['Kontakt', 'Mötesprotokoll', 'Valberedning'], desktopOnly: true },
   ];
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 pb-20 md:pb-12">
-      {/* HEADER - */}
+      {/* HEADER - Minimalistisk */}
       <header className="max-w-7xl mx-auto px-6 py-4 flex justify-end items-center">
         <div className="flex items-center gap-6">
           {user?.emailAddresses[0].emailAddress === ADMIN_EMAIL && (
@@ -77,28 +77,33 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* TOP MENY MED DROPDOWNS - */}
-      <nav className="max-w-7xl mx-auto px-4 md:px-6 mt-4 relative z-50">
-        <div className="bg-black text-white flex flex-wrap items-center justify-center md:justify-start gap-1 md:gap-8 px-4 md:px-8 py-3 rounded-sm shadow-xl">
+      {/* PREMIUM TOP MENU - */}
+      <nav className="max-w-7xl mx-auto px-4 md:px-6 mt-4 md:-mt-6 relative z-50">
+        <div className="bg-black/90 backdrop-blur-md text-white flex items-center justify-center md:justify-start gap-1 md:gap-4 px-2 md:px-8 py-2 md:py-3 rounded-sm md:rounded-xl shadow-2xl border border-white/5">
           {menuData.map((menu) => (
             <div 
               key={menu.title} 
-              className="relative"
+              className={`relative ${menu.desktopOnly ? 'hidden md:block' : ''}`}
               onMouseEnter={() => setActiveMenu(menu.title)}
               onMouseLeave={() => setActiveMenu(null)}
             >
-              <button className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 hover:text-zinc-400 transition-colors">
-                {menu.title} <ChevronDown size={12} className={`transition-transform duration-300 ${activeMenu === menu.title ? 'rotate-180' : ''}`} />
+              <button className="group px-3 md:px-5 py-3 text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-all">
+                <span className="relative">
+                  {menu.title}
+                  {/* Hover-linje för desktop */}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full hidden md:block" />
+                </span>
+                <ChevronDown size={10} className={`transition-transform duration-300 ${activeMenu === menu.title ? 'rotate-180' : ''}`} />
               </button>
               
-              {/* DROPDOWN INNEHÅLL */}
+              {/* DROPDOWN */}
               {activeMenu === menu.title && (
-                <div className="absolute top-full left-0 w-56 bg-black border-t border-zinc-800 shadow-2xl py-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute top-full left-0 w-48 md:w-64 bg-black/95 backdrop-blur-xl shadow-2xl py-4 animate-in fade-in slide-in-from-top-2 duration-200 border border-white/10 rounded-b-lg">
                   {menu.links.map((link) => (
                     <Link 
                       key={link} 
                       href={`/${link.toLowerCase().replace(/ /g, '-')}`}
-                      className="block px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all"
+                      className="block px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
                     >
                       {link}
                     </Link>
@@ -129,7 +134,7 @@ export default function Dashboard() {
               <h3 className="text-xl md:text-2xl font-black uppercase italic tracking-tighter mb-2">
                 {content.news[activeSlide].title}
               </h3>
-              <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4 text-zinc-500">
+              <p className="text-zinc-500 text-xs leading-relaxed line-clamp-2 mb-4">
                 {content.news[activeSlide].text}
               </p>
               <div className="flex items-center justify-between mt-auto">
@@ -180,7 +185,7 @@ export default function Dashboard() {
         </Link>
       </section>
 
-      {/* MODAL FÖR NYHETER */}
+      {/* MODAL & MOBILE NAV - Bevarade */}
       {selectedNews && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
           <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setSelectedNews(null)} />
@@ -204,7 +209,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* MOBILE NAV */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-8 py-4 flex justify-between items-center z-50 shadow-2xl">
         <Link href="/" className="text-black"><Home size={22} /></Link>
         <Link href="/tvattstuga" className="text-zinc-400"><Calendar size={22} /></Link>
