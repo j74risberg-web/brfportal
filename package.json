@@ -19,8 +19,10 @@
     "typescript": "5.3.3",
     "@types/node": "20.11.24",
     "@types/react": "18.2.61",
-    "@types/react-dom": "18.2.19"
+    "@types/react-dom": "18.2.19",
+    "lucide-react": "latest",
+    "clsx": "latest",
+    "tailwind-merge": "latest",
     "@vercel/kv": "latest"
-    
   }
 }
