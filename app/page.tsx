@@ -10,13 +10,13 @@ export default function Dashboard() {
   const [content, setContent] = useState<any>(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const today = new Date().toISOString().split('T')[0];
-  const ADMIN_EMAIL = "j74risberg@gmail.com"; //
+  const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
   useEffect(() => {
     fetch('/api/content')
       .then(res => res.json())
       .then(data => {
-        // Filtrerar bort nyheter som passerat sitt slutdatum
+        // Behåller din logik för att dölja utgångna nyheter
         const visibleNews = data.news?.filter((n: any) => !n.expiryDate || n.expiryDate >= today) || [];
         setContent({ ...data, news: visibleNews });
       });
@@ -30,7 +30,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 pb-20 md:pb-12">
-      {/* HEADER - */}
+      {/* HEADER - Behållit System Admin och Avatar */}
       <header className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic">
           BRF Slalomsvängen 2
@@ -45,7 +45,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* HERO SECTION - */}
+      {/* HERO SECTION - Oförändrad */}
       <section className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="relative h-[40vh] md:h-[55vh] w-full bg-zinc-900 overflow-hidden shadow-2xl rounded-sm">
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent flex items-center p-8 md:p-16 z-10">
@@ -61,7 +61,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* NYHETSKARUSELL - */}
+      {/* NYHETSKARUSELL - TILLAGD */}
       {content.news && content.news.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 md:px-6 mt-12">
           <div className="bg-zinc-50 border flex flex-col md:flex-row items-stretch min-h-[450px] shadow-sm overflow-hidden">
@@ -101,9 +101,8 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* SERVICE GRID - */}
+      {/* SERVICE GRID - Återställd till 3 val */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 mb-20">
-        {/* TVÄTT */}
         <Link href="/tvattstuga" className="group p-10 bg-blue-600 text-white flex flex-col gap-6 hover:bg-blue-700 transition-all shadow-xl">
           <Calendar size={48} className="group-hover:rotate-12 transition-transform duration-500" />
           <div>
@@ -112,7 +111,6 @@ export default function Dashboard() {
           </div>
         </Link>
 
-        {/* BASTU */}
         <Link href="/bastu" className="group p-10 bg-emerald-600 text-white flex flex-col gap-6 hover:bg-emerald-700 transition-all shadow-xl">
           <Waves size={48} className="group-hover:scale-110 transition-transform duration-500" />
           <div>
@@ -121,7 +119,6 @@ export default function Dashboard() {
           </div>
         </Link>
 
-        {/* GÄSTRUM */}
         <Link href="/gastrum" className="group p-10 bg-zinc-900 text-white flex flex-col gap-6 hover:bg-black transition-all shadow-xl">
           <Home size={48} className="group-hover:-translate-y-2 transition-transform duration-500" />
           <div>
@@ -131,7 +128,7 @@ export default function Dashboard() {
         </Link>
       </section>
 
-      {/* MOBILE NAV */}
+      {/* MOBILE NAV - Oförändrad */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-8 py-4 flex justify-between items-center z-50">
         <Link href="/" className="text-black"><Home size={22} /></Link>
         <Link href="/tvattstuga" className="text-zinc-400"><Calendar size={22} /></Link>
