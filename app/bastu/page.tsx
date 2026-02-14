@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, UserButton } from "@clerk/nextjs";
-import { Loader2, Trash2, Home } from "lucide-react";
+import { Loader2, Trash2, Home, Waves } from "lucide-react";
 import Link from "next/link";
 
-export default function BookingPage() {
+export default function BastuPage() {
   const { user, isLoaded } = useUser();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +13,8 @@ export default function BookingPage() {
 
   const fetchBookings = async () => {
     try {
-      const res = await fetch('/api/bookings');
+      // VIKTIGT: Lagt till ?type=bastu
+      const res = await fetch('/api/bookings?type=bastu');
       const data = await res.json();
       setBookings(data || []);
     } catch (e) {
@@ -34,7 +35,8 @@ export default function BookingPage() {
     const updated = [...bookings, newBooking];
     
     try {
-      await fetch('/api/bookings', {
+      // VIKTIGT: Lagt till ?type=bastu
+      await fetch('/api/bookings?type=bastu', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated),
@@ -50,7 +52,8 @@ export default function BookingPage() {
     const updated = bookings.filter(b => b.slot !== slot);
     
     try {
-      await fetch('/api/bookings', {
+      // VIKTIGT: Lagt till ?type=bastu
+      await fetch('/api/bookings?type=bastu', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated),
@@ -61,39 +64,40 @@ export default function BookingPage() {
     }
   };
 
-  if (!isLoaded || loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader2 className="animate-spin text-blue-600 w-10 h-10" />
-      </div>
-    );
-  }
+  if (!isLoaded || loading) return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <Loader2 className="animate-spin text-emerald-600 w-10 h-10" />
+    </div>
+  );
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 sm:p-12">
       <div className="max-w-2xl mx-auto">
-        <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm">
-          <h1 className="text-2xl font-bold">Tvättstuga</h1>
+        <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border-l-8 border-emerald-600">
+          <div className="flex items-center gap-3">
+            <Waves className="text-emerald-600" />
+            <h1 className="text-2xl font-black uppercase italic tracking-tighter text-zinc-900">Bastu</h1>
+          </div>
           <UserButton afterSignOutUrl="/" />
         </div>
 
         <div className="grid gap-4">
-          {['07:00 - 11:00', '11:00 - 15:00', '15:00 - 19:00', '19:00 - 22:00'].map((slot) => {
+          {['09:00 - 12:00', '12:00 - 15:00', '15:00 - 18:00', '18:00 - 21:00'].map((slot) => {
             const booking = bookings.find(b => b.slot === slot);
             const isMyBooking = booking?.userId === user?.id;
 
             return (
-              <div key={slot} className="flex items-center justify-between p-5 bg-white border rounded-xl shadow-sm">
+              <div key={slot} className="flex items-center justify-between p-6 bg-white border rounded-xl shadow-sm transition-all hover:border-emerald-600">
                 <div>
-                  <span className="font-semibold">{slot}</span>
-                  {booking && <p className="text-xs text-blue-600">{isMyBooking ? "Din tid" : `Bokad av ${booking.user}`}</p>}
+                  <span className="font-bold text-lg">{slot}</span>
+                  {booking && <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">{isMyBooking ? "Din bokning" : `Bokad av ${booking.user}`}</p>}
                 </div>
                 {booking ? (
                   isMyBooking && (
-                    <button onClick={() => handleCancel(slot)} className="text-red-600 p-2"><Trash2 size={20} /></button>
+                    <button onClick={() => handleCancel(slot)} className="text-red-600 p-2 hover:bg-red-50 rounded-full transition-colors"><Trash2 size={20} /></button>
                   )
                 ) : (
-                  <button onClick={() => handleBooking(slot)} className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">Boka</button>
+                  <button onClick={() => handleBooking(slot)} className="bg-emerald-600 text-white px-8 py-2 rounded-lg font-black uppercase text-xs tracking-widest shadow-md hover:bg-emerald-700">Boka</button>
                 )}
               </div>
             );
@@ -101,8 +105,8 @@ export default function BookingPage() {
         </div>
 
         <div className="mt-12 text-center">
-          <Link href="/" className="text-gray-400 hover:text-gray-600 flex items-center justify-center space-x-2">
-            <Home className="w-4 h-4" />
+          <Link href="/" className="text-zinc-400 hover:text-black flex items-center justify-center gap-2 font-black uppercase text-[10px] tracking-widest transition-colors">
+            <Home size={14} />
             <span>Tillbaka till portalen</span>
           </Link>
         </div>
