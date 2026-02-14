@@ -1,46 +1,110 @@
 'use client';
 
-import { UserButton, useUser } from "@clerk/nextjs";
-import { CalendarDays, Info, MessageSquare, ShieldCheck } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { useUser, UserButton } from "@clerk/nextjs";
+import { Loader2, Trash2, Home } from "lucide-react";
 import Link from "next/link";
 
-export default function Dashboard() {
-  const { user } = useUser();
+export default function BookingPage() {
+  const { user, isLoaded } = useUser();
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const menuItems = [
-    { title: "Boka Tvättstuga", icon: <CalendarDays />, href: "/tvattstuga", color: "bg-blue-600" },
-    { title: "Information & Regler", icon: <Info />, href: "#", color: "bg-amber-500" },
-    { title: "Felanmälan", icon: <MessageSquare />, href: "#", color: "bg-emerald-600" },
-    { title: "Styrelsen", icon: <ShieldCheck />, href: "#", color: "bg-purple-600" },
-  ];
+  const fetchBookings = async () => {
+    try {
+      const res = await fetch('/api/bookings');
+      const data = await res.json();
+      setBookings(data || []);
+    } catch (e) {
+      console.error("Kunde inte hämta data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isLoaded) fetchBookings();
+  }, [isLoaded]);
+
+  const handleBooking = async (slot: string) => {
+    setActionLoading(slot);
+    const userName = user?.firstName || user?.username || "Granne";
+    const newBooking = { id: Date.now(), slot, user: userName, userId: user?.id };
+    const updated = [...bookings, newBooking];
+    
+    try {
+      await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+      setBookings(updated);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleCancel = async (slot: string) => {
+    setActionLoading(slot);
+    const updated = bookings.filter(b => b.slot !== slot);
+    
+    try {
+      await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+      setBookings(updated);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  if (!isLoaded || loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="animate-spin text-blue-600 w-10 h-10" />
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 p-6 sm:p-12">
-      <div className="max-w-4xl mx-auto">
-        <header className="flex justify-between items-center mb-12">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Välkommen hem, {user?.firstName || "Granne"}!</h1>
-            <p className="text-gray-500">Brf Slalomsvängen 2</p>
-          </div>
+      <div className="max-w-2xl mx-auto">
+        <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm">
+          <h1 className="text-2xl font-bold">Tvättstuga</h1>
           <UserButton afterSignOutUrl="/" />
-        </header>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {menuItems.map((item) => (
-            <Link key={item.title} href={item.item.href} className="group">
-              <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-all flex items-center space-x-6">
-                <div className={`${item.color} text-white p-4 rounded-2xl`}>
-                  {item.icon}
-                </div>
+        <div className="grid gap-4">
+          {['07:00 - 11:00', '11:00 - 15:00', '15:00 - 19:00', '19:00 - 22:00'].map((slot) => {
+            const booking = bookings.find(b => b.slot === slot);
+            const isMyBooking = booking?.userId === user?.id;
+
+            return (
+              <div key={slot} className="flex items-center justify-between p-5 bg-white border rounded-xl shadow-sm">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-400 text-sm">Klicka för att öppna</p>
+                  <span className="font-semibold">{slot}</span>
+                  {booking && <p className="text-xs text-blue-600">{isMyBooking ? "Din tid" : `Bokad av ${booking.user}`}</p>}
                 </div>
+                {booking ? (
+                  isMyBooking && (
+                    <button onClick={() => handleCancel(slot)} className="text-red-600 p-2"><Trash2 size={20} /></button>
+                  )
+                ) : (
+                  <button onClick={() => handleBooking(slot)} className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">Boka</button>
+                )}
               </div>
-            </Link>
-          ))}
+            );
+          })}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Link href="/" className="text-gray-400 hover:text-gray-600 flex items-center justify-center space-x-2">
+            <Home className="w-4 h-4" />
+            <span>Tillbaka till portalen</span>
+          </Link>
         </div>
       </div>
     </main>
