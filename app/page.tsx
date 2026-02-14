@@ -15,7 +15,6 @@ export default function Dashboard() {
   const today = new Date().toISOString().split('T')[0];
   const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
-  // Menystruktur: Styrelse visas endast på desktop (hidden md:block logik nedan)
   const menuData = [
     { title: 'Om', links: ['Föreningen', 'Fastigheten', 'Stadgar & Regler'] },
     { title: 'Ekonomi', links: ['Årsredovisningar', 'Mäklarinfo', 'Avgifter'] },
@@ -49,7 +48,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 pb-20 md:pb-12">
-      {/* HEADER - Minimalistisk */}
+      {/* HEADER */}
       <header className="max-w-7xl mx-auto px-6 py-4 flex justify-end items-center">
         <div className="flex items-center gap-6">
           {user?.emailAddresses[0].emailAddress === ADMIN_EMAIL && (
@@ -61,11 +60,14 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* HERO SECTION - */}
+      {/* HERO SECTION - Text flyttad till övre vänstra hörnet */}
       <section className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="relative h-[25vh] md:h-[55vh] w-full bg-zinc-900 overflow-hidden shadow-2xl rounded-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent flex items-center p-6 md:p-16 z-10">
-            <h2 className="text-white text-3xl md:text-7xl font-black uppercase italic leading-none tracking-tighter border-l-4 md:border-l-8 border-white pl-4 md:pl-6">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent flex items-start justify-start p-10 md:p-24 z-10">
+            <h2 
+              style={{ fontSize: content.heroTitleSize || 'inherit' }}
+              className={`text-white font-black uppercase italic leading-none tracking-tighter border-l-4 md:border-l-8 border-white pl-4 md:pl-6 text-left ${!content.heroTitleSize ? 'text-3xl md:text-7xl' : ''}`}
+            >
               {content.heroTitle}
             </h2>
           </div>
@@ -77,7 +79,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* PREMIUM TOP MENU - */}
+      {/* PREMIUM TOP MENU */}
       <nav className="max-w-7xl mx-auto px-4 md:px-6 mt-4 md:-mt-6 relative z-50">
         <div className="bg-black/90 backdrop-blur-md text-white flex items-center justify-center md:justify-start gap-1 md:gap-4 px-2 md:px-8 py-2 md:py-3 rounded-sm md:rounded-xl shadow-2xl border border-white/5">
           {menuData.map((menu) => (
@@ -90,13 +92,11 @@ export default function Dashboard() {
               <button className="group px-3 md:px-5 py-3 text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-all">
                 <span className="relative">
                   {menu.title}
-                  {/* Hover-linje för desktop */}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full hidden md:block" />
                 </span>
                 <ChevronDown size={10} className={`transition-transform duration-300 ${activeMenu === menu.title ? 'rotate-180' : ''}`} />
               </button>
               
-              {/* DROPDOWN */}
               {activeMenu === menu.title && (
                 <div className="absolute top-full left-0 w-48 md:w-64 bg-black/95 backdrop-blur-xl shadow-2xl py-4 animate-in fade-in slide-in-from-top-2 duration-200 border border-white/10 rounded-b-lg">
                   {menu.links.map((link) => (
@@ -115,7 +115,7 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      {/* NYHETSKARUSELL - */}
+      {/* NYHETSKARUSELL */}
       {content.news && content.news.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 md:px-6 mt-8 md:mt-12">
           <div className="bg-zinc-50 border flex flex-col md:flex-row h-auto md:h-64 shadow-sm overflow-hidden group">
@@ -160,7 +160,7 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* SERVICE GRID - */}
+      {/* SERVICE GRID */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 md:mt-12 mb-20">
         <Link href="/tvattstuga" className="group p-10 bg-blue-600 text-white flex flex-col gap-6 hover:bg-blue-700 transition-all shadow-xl">
           <Calendar size={48} className="group-hover:rotate-12 transition-transform duration-500" />
@@ -185,7 +185,7 @@ export default function Dashboard() {
         </Link>
       </section>
 
-      {/* MODAL & MOBILE NAV - Bevarade */}
+      {/* MODAL */}
       {selectedNews && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
           <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setSelectedNews(null)} />
@@ -209,6 +209,7 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* MOBILE NAV */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 px-8 py-4 flex justify-between items-center z-50 shadow-2xl">
         <Link href="/" className="text-black"><Home size={22} /></Link>
         <Link href="/tvattstuga" className="text-zinc-400"><Calendar size={22} /></Link>
