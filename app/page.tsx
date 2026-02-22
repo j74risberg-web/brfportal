@@ -5,6 +5,9 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import { ChevronLeft, ChevronRight, Calendar, Home, Waves, Loader2, X, Maximize2, ChevronDown } from "lucide-react";
 import Link from "next/link";
 
+// Tvingar Next.js att hämta ny data vid varje laddning istället för att visa gammal cache
+export const dynamic = 'force-dynamic';
+
 export default function Dashboard() {
   const { user } = useUser();
   const [content, setContent] = useState<any>(null);
@@ -12,10 +15,9 @@ export default function Dashboard() {
   const [selectedNews, setSelectedNews] = useState<any>(null); 
   const [activeMenu, setActiveMenu] = useState<string | null>(null); 
   
-  const today = new Date().toISOString().split('T')[0];
   const ADMIN_EMAIL = "j74risberg@gmail.com"; 
 
-  // Menystruktur: Optimerad för plats (Info + Styrelse gömd på mobil)
+  // Menystruktur
   const menuData = [
     { title: 'Om', links: ['Föreningen', 'Fastigheten', 'Stadgar & Regler'] },
     { title: 'Ekonomi', links: ['Årsredovisningar', 'Mäklarinfo', 'Avgifter'] },
@@ -27,8 +29,10 @@ export default function Dashboard() {
     fetch('/api/content')
       .then(res => res.json())
       .then(data => {
-        const visibleNews = data.news?.filter((n: any) => !n.expiryDate || n.expiryDate >= today) || [];
-        setContent({ ...data, news: visibleNews });
+        // FIX: Vi har tagit bort .filter((n) => n.expiryDate...) 
+        // Nu visas alla nyheter som finns i databasen oavsett datum.
+        const allNews = data.news || [];
+        setContent({ ...data, news: allNews });
       });
   }, []);
 
@@ -61,7 +65,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* HERO SECTION - Dynamisk rubrik i vänstra hörnet */}
+      {/* HERO SECTION */}
       <section className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="relative h-[25vh] md:h-[55vh] w-full bg-zinc-900 overflow-hidden shadow-2xl rounded-sm">
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent flex items-start justify-start p-10 md:p-24 z-10">
@@ -69,6 +73,7 @@ export default function Dashboard() {
               style={{ fontSize: content.heroTitleSize || 'inherit' }}
               className={`text-white font-black uppercase italic leading-none tracking-tighter border-l-4 md:border-l-8 border-white pl-4 md:pl-6 text-left ${!content.heroTitleSize ? 'text-3xl md:text-7xl' : ''}`}
             >
+              {/* Om du vill ha BRF på en rad och resten på nästa, kan du skriva in det med en radbrytning i admin */}
               {content.heroTitle}
             </h2>
           </div>
@@ -80,7 +85,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* PREMIUM TOP MENU - Glassmorphism */}
+      {/* PREMIUM TOP MENU */}
       <nav className="max-w-7xl mx-auto px-4 md:px-6 mt-4 md:-mt-6 relative z-50">
         <div className="bg-black/90 backdrop-blur-md text-white flex items-center justify-center md:justify-start gap-1 md:gap-4 px-2 md:px-8 py-2 md:py-3 rounded-sm md:rounded-xl shadow-2xl border border-white/5">
           {menuData.map((menu) => (
@@ -161,14 +166,15 @@ export default function Dashboard() {
         </section>
       )}
 
-      {/* SERVICE GRID - Kompakta glass-knappar */}
+      {/* SERVICE GRID */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 md:mt-12 mb-20">
         <Link href="/tvattstuga" className="group p-6 bg-blue-600/90 backdrop-blur-md text-white flex items-center gap-5 hover:bg-blue-600 transition-all shadow-lg rounded-sm border border-white/10">
           <div className="bg-white/10 p-3 rounded-sm group-hover:rotate-12 transition-transform duration-500">
             <Calendar size={28} />
           </div>
           <div>
-            <h4 className="text-lg font-black uppercase italic tracking-tighter">Boka Tvätt</h4>
+            {/* Ändrat till Boka Tvättid enligt önskemål */}
+            <h4 className="text-lg font-black uppercase italic tracking-tighter">Boka Tvättid</h4>
             <p className="text-blue-100/70 text-[9px] font-black uppercase tracking-widest">Digitalt System</p>
           </div>
         </Link>
@@ -194,7 +200,7 @@ export default function Dashboard() {
         </Link>
       </section>
 
-      {/* MODAL */}
+      {/* MODAL FÖR NYHETER */}
       {selectedNews && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
           <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => setSelectedNews(null)} />
