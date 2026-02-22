@@ -112,17 +112,20 @@ export default function SuperAdminPage() {
               <section className="lg:col-span-2 bg-white p-8 border border-zinc-200 shadow-sm">
                 <div className="flex justify-between items-center mb-6 border-b pb-2">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 italic">2. Nyhetskarusell</h3>
-                  <button onClick={() => setContent({...content, news: [{title: "Nyhet", date: "IDAG", text: "...", image: "", expiryDate: ""}, ...(content.news || [])]})} className="text-[10px] font-black uppercase text-blue-600">+ Nytt inlägg</button>
+                  {/* FIX: Tog bort expiryDate härifrån */}
+                  <button onClick={() => setContent({...content, news: [{title: "Nyhet", date: "IDAG", text: "...", image: ""}, ...(content.news || [])]})} className="text-[10px] font-black uppercase text-blue-600">+ Nytt inlägg</button>
                 </div>
                 <div className="space-y-6">
                   {content.news?.map((n: any, i: number) => (
                     <div key={i} className="p-6 bg-zinc-50 border-l-8 border-black relative group">
                       <button onClick={() => { const u = content.news.filter((_:any, idx:number) => idx !== i); setContent({...content, news: u}); }} className="absolute top-4 right-4 text-zinc-300 hover:text-red-600"><Trash2 size={18}/></button>
-                      <div className="grid grid-cols-2 gap-4 mb-4">
+                      
+                      {/* Ändrade till 3 kolumner istället för 4 då vi tog bort slutdatum */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <input value={n.title} placeholder="Rubrik" onChange={e => { const u = [...content.news]; u[i].title = e.target.value; setContent({...content, news: u}); }} className="font-black uppercase text-sm bg-white p-2 outline-none" />
                         <input value={n.date} placeholder="Datum (t.ex. 12 MAJ)" onChange={e => { const u = [...content.news]; u[i].date = e.target.value; setContent({...content, news: u}); }} className="font-black text-blue-600 text-xs bg-white p-2 outline-none" />
                         <input value={n.image} placeholder="Bild-URL" onChange={e => { const u = [...content.news]; u[i].image = e.target.value; setContent({...content, news: u}); }} className="text-[10px] font-mono bg-white p-2 outline-none" />
-                        <input type="date" value={n.expiryDate} onChange={e => { const u = [...content.news]; u[i].expiryDate = e.target.value; setContent({...content, news: u}); }} className="font-bold text-xs bg-white p-2 outline-none" />
+                        {/* FIX: Här satt tidigare <input type="date" ... /> - Den är nu raderad */}
                       </div>
                       <textarea value={n.text} onChange={e => { const u = [...content.news]; u[i].text = e.target.value; setContent({...content, news: u}); }} className="w-full bg-white p-3 text-xs text-zinc-500 h-20 resize-none outline-none" />
                     </div>
