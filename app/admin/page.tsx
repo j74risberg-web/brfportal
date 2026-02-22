@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useUser } from "@clerk/nextjs";
 import { Save, Plus, Trash2, Loader2, ArrowLeft, Image as ImageIcon, Calendar, Waves, Home, Clock } from "lucide-react";
+import Link from "next/link"; // Importera Link för navigering
 
 export default function SuperAdminPage() {
   const { user, isLoaded } = useUser();
@@ -17,10 +18,8 @@ export default function SuperAdminPage() {
 
   useEffect(() => {
     if (isLoaded && user?.emailAddresses[0].emailAddress.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-      // Hämta sidinnehåll
       fetch('/api/content').then(res => res.json()).then(data => setContent(data));
       
-      // Hämta alla typer av bokningar
       Promise.all([
         fetch('/api/bookings?type=tvatt').then(res => res.json()),
         fetch('/api/bookings?type=bastu').then(res => res.json()),
@@ -59,19 +58,30 @@ export default function SuperAdminPage() {
             <h1 className="text-4xl font-black uppercase italic tracking-tighter leading-none">System Control</h1>
             <p className="text-[10px] font-bold tracking-[0.3em] text-zinc-500 mt-2 uppercase">BRF Slalomsvängen 2</p>
           </div>
-          <div className="flex gap-4">
-            <button 
-              onClick={() => setActiveTab('content')}
-              className={`px-6 py-3 text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'content' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
+          
+          <div className="flex items-center gap-2">
+            {/* NY KNAPP: TILLBAKA TILL PORTALEN */}
+            <Link 
+              href="/" 
+              className="px-6 py-3 text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-all flex items-center gap-2 border-r border-zinc-800 pr-6 mr-2"
             >
-              Redigera Innehåll
-            </button>
-            <button 
-              onClick={() => setActiveTab('bookings')}
-              className={`px-6 py-3 text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'bookings' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
-            >
-              Visa Bokningar
-            </button>
+              <ArrowLeft size={14} /> Till Portal
+            </Link>
+
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setActiveTab('content')}
+                className={`px-6 py-3 text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'content' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
+              >
+                Redigera Innehåll
+              </button>
+              <button 
+                onClick={() => setActiveTab('bookings')}
+                className={`px-6 py-3 text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'bookings' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
+              >
+                Visa Bokningar
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -112,20 +122,16 @@ export default function SuperAdminPage() {
               <section className="lg:col-span-2 bg-white p-8 border border-zinc-200 shadow-sm">
                 <div className="flex justify-between items-center mb-6 border-b pb-2">
                   <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 italic">2. Nyhetskarusell</h3>
-                  {/* FIX: Tog bort expiryDate härifrån */}
                   <button onClick={() => setContent({...content, news: [{title: "Nyhet", date: "IDAG", text: "...", image: ""}, ...(content.news || [])]})} className="text-[10px] font-black uppercase text-blue-600">+ Nytt inlägg</button>
                 </div>
                 <div className="space-y-6">
                   {content.news?.map((n: any, i: number) => (
                     <div key={i} className="p-6 bg-zinc-50 border-l-8 border-black relative group">
                       <button onClick={() => { const u = content.news.filter((_:any, idx:number) => idx !== i); setContent({...content, news: u}); }} className="absolute top-4 right-4 text-zinc-300 hover:text-red-600"><Trash2 size={18}/></button>
-                      
-                      {/* Ändrade till 3 kolumner istället för 4 då vi tog bort slutdatum */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <input value={n.title} placeholder="Rubrik" onChange={e => { const u = [...content.news]; u[i].title = e.target.value; setContent({...content, news: u}); }} className="font-black uppercase text-sm bg-white p-2 outline-none" />
                         <input value={n.date} placeholder="Datum (t.ex. 12 MAJ)" onChange={e => { const u = [...content.news]; u[i].date = e.target.value; setContent({...content, news: u}); }} className="font-black text-blue-600 text-xs bg-white p-2 outline-none" />
                         <input value={n.image} placeholder="Bild-URL" onChange={e => { const u = [...content.news]; u[i].image = e.target.value; setContent({...content, news: u}); }} className="text-[10px] font-mono bg-white p-2 outline-none" />
-                        {/* FIX: Här satt tidigare <input type="date" ... /> - Den är nu raderad */}
                       </div>
                       <textarea value={n.text} onChange={e => { const u = [...content.news]; u[i].text = e.target.value; setContent({...content, news: u}); }} className="w-full bg-white p-3 text-xs text-zinc-500 h-20 resize-none outline-none" />
                     </div>
@@ -191,9 +197,9 @@ export default function SuperAdminPage() {
       </div>
 
       {/* MOBILE BACK BUTTON */}
-      <a href="/" className="fixed bottom-8 right-8 bg-black text-white p-4 rounded-full shadow-2xl md:hidden z-50">
+      <Link href="/" className="fixed bottom-8 right-8 bg-black text-white p-4 rounded-full shadow-2xl md:hidden z-50">
         <Home size={24} />
-      </a>
+      </Link>
     </main>
   );
 }
